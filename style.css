@@ -1,0 +1,29 @@
+html {
+  height: 100%;
+}
+
+body {
+  margin: 8px;
+  height: calc(100% - 2 * 8px);
+  background-color: #CFF;
+}
+
+div#left {
+  float: left;
+  width: 50%;
+  height: 100%;
+}
+
+div#right {
+  float: right;
+  width: 50%;
+  height: 100%;
+}
+
+p#stdout {
+  font-family: monospace;
+  margin: 16px;
+  height: calc(100% - 2 * 16px);
+  overflow: scroll;
+  background-color: #CCC;
+}
