@@ -6,25 +6,30 @@ variableNames = []
 
 grobnerBasis = (fs) ->
   fs = fs.filter((f) -> not f.isZero())
+  println("-- Start Buchberger's algorithm")
   while true
-    println("in grobnerBasis, fs: #{fs}")
+    println("-- G <- #{fs}")
     added = false
     len = fs.length
     for i in [0 ... len]
       for j in [i + 1 ... len]
         s = sPolynomial(fs[i], fs[j])
+        println("-- s <- S(#{fs[i]}, #{fs[j]}) = #{s}")
         while true
           reduced = false
           for f in fs
             if reducible(s, f)
               s = reduce(s, f)
               reduced = true
+              println("-- s <- #{s}")
           if not reduced
             break
         if not s.isZero()
           fs.push(s)
           added = true
+          println("-- G <- #{fs}")
     if not added
+      println("-- Finish Buchberger's algorithm")
       return fs
 
 sPolynomial = (f1, f2) ->
@@ -287,7 +292,7 @@ setDisabled("compute", off)
 
 document.getElementById("compute").onclick = () ->
 
-  println("start!")
+  println("Start!")
   setDisabled("variables")
   setDisabled("f")
   setDisabled("compute")
@@ -302,7 +307,7 @@ document.getElementById("compute").onclick = () ->
     println("f: #{f}")
 
     dfs = variables.map((x) -> f.derivative(x))
-    println("dfs: #{dfs}")
+    println("partial derivatives of f: #{dfs}")
 
     setTimeout ->
 
@@ -310,23 +315,23 @@ document.getElementById("compute").onclick = () ->
       println("basis: #{basis}")
 
       lts = basis.map((f) -> f.leading().term)
-      println("lts: #{lts}")
+      println("leading terms: #{lts}")
 
       setTimeout ->
 
         qbasis = quotientBasis(lts)
         if qbasis is notFound
-          println("qbasis: infinite")
+          println("basis of quotient: infinite")
           mu = "Infinity"
         else
-          println("qbasis: #{qbasis}")
+          println("basis of quotient: #{qbasis}")
           mu = qbasis.length
 
-        println("mu: #{mu}")
+        println("Milnor number: #{mu}")
 
         setValue("mu", mu)
 
-        println("finish!")
+        println("Finish!")
         setDisabled("variables", off)
         setDisabled("f", off)
         setDisabled("compute", off)

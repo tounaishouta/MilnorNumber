@@ -12,13 +12,15 @@
     fs = fs.filter(function(f) {
       return !f.isZero();
     });
+    println("-- Start Buchberger's algorithm");
     while (true) {
-      println("in grobnerBasis, fs: " + fs);
+      println("-- G <- " + fs);
       added = false;
       len = fs.length;
       for (i = k = 0, ref = len; 0 <= ref ? k < ref : k > ref; i = 0 <= ref ? ++k : --k) {
         for (j = l = ref1 = i + 1, ref2 = len; ref1 <= ref2 ? l < ref2 : l > ref2; j = ref1 <= ref2 ? ++l : --l) {
           s = sPolynomial(fs[i], fs[j]);
+          println("-- s <- S(" + fs[i] + ", " + fs[j] + ") = " + s);
           while (true) {
             reduced = false;
             for (n = 0, len1 = fs.length; n < len1; n++) {
@@ -26,6 +28,7 @@
               if (reducible(s, f)) {
                 s = reduce(s, f);
                 reduced = true;
+                println("-- s <- " + s);
               }
             }
             if (!reduced) {
@@ -35,10 +38,12 @@
           if (!s.isZero()) {
             fs.push(s);
             added = true;
+            println("-- G <- " + fs);
           }
         }
       }
       if (!added) {
+        println("-- Finish Buchberger's algorithm");
         return fs;
       }
     }
@@ -468,7 +473,7 @@
   setDisabled("compute", false);
 
   document.getElementById("compute").onclick = function() {
-    println("start!");
+    println("Start!");
     setDisabled("variables");
     setDisabled("f");
     setDisabled("compute");
@@ -486,7 +491,7 @@
       dfs = variables.map(function(x) {
         return f.derivative(x);
       });
-      println("dfs: " + dfs);
+      println("partial derivatives of f: " + dfs);
       return setTimeout(function() {
         var basis, lts;
         basis = grobnerBasis(dfs);
@@ -494,20 +499,20 @@
         lts = basis.map(function(f) {
           return f.leading().term;
         });
-        println("lts: " + lts);
+        println("leading terms: " + lts);
         return setTimeout(function() {
           var mu, qbasis;
           qbasis = quotientBasis(lts);
           if (qbasis === notFound) {
-            println("qbasis: infinite");
+            println("basis of quotient: infinite");
             mu = "Infinity";
           } else {
-            println("qbasis: " + qbasis);
+            println("basis of quotient: " + qbasis);
             mu = qbasis.length;
           }
-          println("mu: " + mu);
+          println("Milnor number: " + mu);
           setValue("mu", mu);
-          println("finish!");
+          println("Finish!");
           setDisabled("variables", false);
           setDisabled("f", false);
           return setDisabled("compute", false);
