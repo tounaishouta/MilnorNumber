@@ -8,14 +8,16 @@
   variableNames = [];
 
   grobnerBasis = function(fs) {
-    var added, f, i, j, k, l, len, len1, n, reduced, ref, ref1, s;
-    fs = fs.slice();
+    var added, f, i, j, k, l, len, len1, n, reduced, ref, ref1, ref2, s;
+    fs = fs.filter(function(f) {
+      return !f.isZero();
+    });
     while (true) {
       println("in grobnerBasis, fs: " + fs);
       added = false;
       len = fs.length;
       for (i = k = 0, ref = len; 0 <= ref ? k < ref : k > ref; i = 0 <= ref ? ++k : --k) {
-        for (j = l = 0, ref1 = len; 0 <= ref1 ? l < ref1 : l > ref1; j = 0 <= ref1 ? ++l : --l) {
+        for (j = l = ref1 = i + 1, ref2 = len; ref1 <= ref2 ? l < ref2 : l > ref2; j = ref1 <= ref2 ? ++l : --l) {
           s = sPolynomial(fs[i], fs[j]);
           while (true) {
             reduced = false;

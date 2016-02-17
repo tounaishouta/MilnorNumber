@@ -5,13 +5,13 @@ variables = []
 variableNames = []
 
 grobnerBasis = (fs) ->
-  fs = fs.slice()
+  fs = fs.filter((f) -> not f.isZero())
   while true
     println("in grobnerBasis, fs: #{fs}")
     added = false
     len = fs.length
     for i in [0 ... len]
-      for j in [0 ... len]
+      for j in [i + 1 ... len]
         s = sPolynomial(fs[i], fs[j])
         while true
           reduced = false
