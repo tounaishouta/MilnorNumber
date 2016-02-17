@@ -8,17 +8,24 @@ grobnerBasis = (fs) ->
   fs = fs.slice()
   while true
     println("in grobnerBasis, fs: #{fs}")
-    gs = []
-    for i in [0 ... fs.length]
-      for j in [i + 1 ... fs.length]
+    added = false
+    len = fs.length
+    for i in [0 ... len]
+      for j in [0 ... len]
         s = sPolynomial(fs[i], fs[j])
-        for f in fs
-          s = reduce(s, f)
+        while true
+          reduced = false
+          for f in fs
+            if reducible(s, f)
+              s = reduce(s, f)
+              reduced = true
+          if not reduced
+            break
         if not s.isZero()
-          gs.push(s)
-    if gs.length is 0
+          fs.push(s)
+          added = true
+    if not added
       return fs
-    fs = fs.concat(gs)
 
 sPolynomial = (f1, f2) ->
   if f1.isZero() or f2.isZero()
@@ -29,18 +36,24 @@ sPolynomial = (f1, f2) ->
   f1.times(Polynomial.from(l2.divide(g)))
     .subtract(f2.times(Polynomial.from(l1.divide(g))))
 
+reducible = (f1, f2) ->
+  if f2.isZero()
+    throw "reduce: try to reduce by zero"
+  if f1.isZero()
+    return false
+  return f2.leading().term.divides(f1.leading().term)
+
 reduce = (f1, f2) ->
+  if f1.isZero()
+    return f1
+  l1 = f1.leading()
   if f2.isZero()
     throw "reduce: try to reduce by zero"
   l2 = f2.leading()
-  while true
-    if f1.isZero()
-      return f1
-    l1 = f1.leading()
-    g = Monomial.gcd(l1, l2)
-    if not g.term.equals(l2.term)
-      return f1
-    f1 = f1.times(Polynomial.from(l2.divide(g)))
+  if not l2.term.divides(l1.term)
+    return f1
+  g = Monomial.gcd(l1, l2)
+  return f1.times(Polynomial.from(l2.divide(g)))
           .subtract(f2.times(Polynomial.from(l1.divide(g))))
 
 quotientBasis = (generators) ->
