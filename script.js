@@ -450,27 +450,27 @@
 
   basisOfQuotient = (function(_this) {
     return function(generators) {
-      var allTerms, error, error1, upperBound;
-      try {
-        upperBound = indices(variables).map(function(i) {
-          return generators.filter(function(generator) {
-            return generator.hasOnly(i);
-          }).map(function(generator) {
-            return generator.degrees[i];
-          }).reduce(Math.min);
-        });
-      } catch (error1) {
-        error = error1;
-        return "Infinity";
-      }
-      allTerms = latticePointUnder(upperBound).map(function(lp) {
-        return new Term(lp);
+      var upperBound;
+      upperBound = indices(variables).map(function(i) {
+        return Math.min.apply(Math, generators.filter(function(generator) {
+          return generator.hasOnly(i);
+        }).map(function(generator) {
+          return generator.degrees[i];
+        }));
       });
-      return generators.reduce((function(terms, generator) {
-        return terms.filter(function(term) {
-          return !generator.divides(term);
-        });
-      }), allTerms);
+      if (upperBound.some(function(u) {
+        return u === Infinity;
+      })) {
+        return "Infinity";
+      } else {
+        return generators.reduce((function(terms, generator) {
+          return terms.filter(function(term) {
+            return !generator.divides(term);
+          });
+        }), latticePointUnder(upperBound).map(function(lp) {
+          return new Term(lp);
+        }));
+      }
     };
   })(this);
 
@@ -612,7 +612,7 @@
   main = (function(_this) {
     return function() {
       setValue("variables", "x y");
-      setValue("f", "x^3 + -1 x y^2");
+      setValue("f", "y^4 + x y^2 + x^2");
       setValue("mu", "");
       ["variables", "f", "compute"].forEach(setEnable);
       return document.getElementById("compute").onclick = onclick;

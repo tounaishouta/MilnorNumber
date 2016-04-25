@@ -281,22 +281,23 @@ allSPolynomials = (fs) =>
 # 無限次元になる場合は文字列 "Infinity" を返す。
 basisOfQuotient = (generators) =>
 
-  try
-    upperBound = indices(variables).map((i) =>
+  upperBound = indices(variables).map((i) =>
+    Math.min(
       generators
         .filter((generator) => generator.hasOnly(i))
-        .map((generator) => generator.degrees[i])
-        .reduce(Math.min) # 空配列に対して reduce すると例外が投げられる。
-      )
-  catch error
+        .map((generator) => generator.degrees[i]) ...
+    )
+  )
+
+  if upperBound.some((u) => u is Infinity)
     return "Infinity"
-
-  # upperBound より全ての次数が小さい単項式全体
-  allTerms = latticePointUnder(upperBound).map((lp) => new Term(lp))
-
-  generators.reduce(((terms, generator) =>
-    terms.filter((term) => not generator.divides(term))
-  ), allTerms)
+  else
+    generators.reduce(
+      ((terms, generator) =>
+        terms.filter((term) => not generator.divides(term))
+      ),
+      latticePointUnder(upperBound).map((lp) => new Term(lp))
+    )
 
 # upperBound より全ての要素が小さい配列全体
 # i.e latticePointUnder([2, 3]) = [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2]]
@@ -387,7 +388,8 @@ onclick = =>
 
 main = =>
   setValue("variables", "x y")
-  setValue("f", "x^3 + -1 x y^2")
+  # setValue("f", "x^3 + -1 x y^2")
+  setValue("f", "y^4 + x y^2 + x^2")
   setValue("mu", "")
   ["variables", "f", "compute"].forEach(setEnable)
   document.getElementById("compute").onclick = onclick
